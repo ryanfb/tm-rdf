@@ -4,8 +4,11 @@ Encoding.default_external = Encoding::UTF_8
 Encoding.default_internal = Encoding::UTF_8
 
 require 'csv'
+require 'rdf/raptor'
 
-tm_dir = ARGV
+text_url_prefix = "http://www.trismegistos.org/text"
+
+tm_dir, output_ttl = ARGV
 
 tex = {}
 
@@ -15,3 +18,26 @@ CSV.foreach(File.join(tm_dir, "tex.csv"), :headers => false) do |row|
 end
 
 $stderr.puts tex.length
+
+graph = RDF::Graph.new
+
+tex.each do |text|
+  tm_id = text[0]
+  tm_reuse_string = text[1][14]
+  if ((!tm_reuse_string.nil?) && (!tm_reuse_string.empty?))
+    all_reuses = tm_reuse_string.split(",").map{|i| i.strip}
+    all_reuses.each do |reuse_tm_id|
+      $stderr.puts "Inserting reuse #{tm_id} -> #{reuse_tm_id}"
+      graph << RDF::Statement.new(
+        RDF::URI.new("#{text_url_prefix}/#{tm_id}"),
+        RDF::DC.relation,
+        RDF::URI.new("#{text_url_prefix}/#{reuse_tm_id}"))
+    end
+  end
+end
+
+RDF::Writer.open(output_ttl) do |writer|
+  graph.each_statement do |statement|
+    writer << statement
+  end
+end
