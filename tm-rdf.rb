@@ -6,7 +6,14 @@ Encoding.default_internal = Encoding::UTF_8
 require 'csv'
 require 'rdf/raptor'
 
-text_url_prefix = "http://www.trismegistos.org/text"
+tm_prefix = "http://www.trismegistos.org"
+# /text/
+# /place/
+# /name/
+# /archive/
+# /collection/
+# /ref/ e.g. http://www.trismegistos.org/ref/detail.php?ref_id=83996 for name references
+# /person/ e.g. www.trismegistos.org/person/48170
 
 tm_dir, output_ttl = ARGV
 
@@ -29,9 +36,9 @@ tex.each do |text|
     all_reuses.each do |reuse_tm_id|
       $stderr.puts "Inserting reuse #{tm_id} -> #{reuse_tm_id}"
       graph << RDF::Statement.new(
-        RDF::URI.new("#{text_url_prefix}/#{tm_id}"),
+        RDF::URI.new("#{text_url_prefix}/text/#{tm_id}"),
         RDF::DC.relation,
-        RDF::URI.new("#{text_url_prefix}/#{reuse_tm_id}"))
+        RDF::URI.new("#{text_url_prefix}/text/#{reuse_tm_id}"))
     end
   end
 end
