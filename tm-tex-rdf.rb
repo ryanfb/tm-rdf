@@ -36,9 +36,9 @@ tex.each do |text|
     all_reuses.each do |reuse_tm_id|
       $stderr.puts "Inserting reuse #{tm_id} -> #{reuse_tm_id}"
       graph << RDF::Statement.new(
-        RDF::URI.new("#{text_url_prefix}/text/#{tm_id}"),
+        RDF::URI.new("#{tm_prefix}/text/#{tm_id}"),
         RDF::DC.relation,
-        RDF::URI.new("#{text_url_prefix}/text/#{reuse_tm_id}"))
+        RDF::URI.new("#{tm_prefix}/text/#{reuse_tm_id}"))
     end
   end
 end
